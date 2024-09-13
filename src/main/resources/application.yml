@@ -1,0 +1,46 @@
+var:
+  nacos:
+    addr: test.nacos-in.hifor.net:8848
+    username: nacos-sample
+    password: "Ry*UuP6#k$VE^BLr"
+    namespace: de16af61-c5b9-41ec-b594-6c7e88bb57ca
+    group: sample-group
+
+
+server:
+  #default port 8080
+  port: 8989
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: sample-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${var.nacos.addr}
+        username: ${var.nacos.username}
+        password: ${var.nacos.password}
+        namespace: ${var.nacos.namespace}
+        group: ${var.nacos.group}
+    gateway:
+      discovery:
+        locator:
+          # 开启后，gateway会自动将服务发现列表转化为路由
+          enabled: true
+      routes:
+        - id: service-http-route
+          uri: lb://service-http
+          filters:
+            # 表示请求路由时会去掉path前缀
+            - StripPrefix=1
+          predicates:
+            - Path=/one/**,/two/**
+            # 以下配置与上面等价
+            #- name: Path
+            #  args:
+            #    #map格式,取value,key名称随意
+            #    p1: /one/**
+            #    p2: /two/**
+
